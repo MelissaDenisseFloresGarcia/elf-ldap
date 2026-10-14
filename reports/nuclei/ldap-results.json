@@ -1,0 +1,38 @@
+﻿{
+    "template-id":  "node-express-dev-env",
+    "matched-at":  "http://elf-ldap:3001",
+    "type":  "http",
+    "info":  {
+                 "name":  "Node.js Express NODE_ENV Development Mode",
+                 "author":  [
+                                "flx"
+                            ],
+                 "tags":  [
+                              "nodejs",
+                              "express",
+                              "misconfig",
+                              "devops",
+                              "cicd",
+                              "trace",
+                              "vuln"
+                          ],
+                 "description":  "The Node.js application runs in development mode, which can expose sensitive information, such as source code and secrets, depending on the application.\n",
+                 "reference":  [
+                                   "https://www.invicti.com/web-vulnerability-scanner/vulnerabilities/express-development-mode-is-enabled/",
+                                   "https://www.synopsys.com/blogs/software-security/nodejs-mean-stack-vulnerabilities.html"
+                               ],
+                 "severity":  "medium",
+                 "metadata":  {
+                                  "max-request":  2,
+                                  "shodan-query":  "X-Powered-By: Express",
+                                  "verified":  true
+                              },
+                 "classification":  {
+                                        "cve-id":  null,
+                                        "cwe-id":  [
+                                                       "cwe-209"
+                                                   ]
+                                    }
+             },
+    "timestamp":  "2026-10-14T20:29:34.45238443Z"
+}
