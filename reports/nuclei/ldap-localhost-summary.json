@@ -1,0 +1,6 @@
+﻿{
+    "template_id":  "node-express-dev-env",
+    "severity":  "medium",
+    "target":  "http://host.docker.internal:3001",
+    "timestamp":  "2026-10-14T23:48:18.487976941Z"
+}
