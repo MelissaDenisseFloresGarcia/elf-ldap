@@ -1,0 +1,8 @@
+FINAL LDAP VERIFICATION
+Environment: Security testing
+NODE_ENV: production
+HTTP port: 3003
+HTTPS port: 3636
+TLS connectivity: Verified
+Authentication credentials: Laboratory environment
+Original LDAP container: Not replaced
