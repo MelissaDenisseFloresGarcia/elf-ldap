@@ -1,0 +1,6 @@
+﻿{
+    "template_id":  "node-express-dev-env",
+    "severity":  "medium",
+    "target":  "http://127.0.0.1:3001",
+    "timestamp":  "2026-10-14T21:08:40.6485743-06:00"
+}
