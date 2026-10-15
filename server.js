@@ -1,4 +1,5 @@
 const express = require("express");
+const { rateLimit, ipKeyGenerator } = require("express-rate-limit");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const https = require("https");
@@ -9,7 +10,11 @@ const app = express();
 const PORT = 3001;
 const TLS_PORT = 636;
 
-const SECRET_KEY = process.env.JWT_SECRET || "elf-secret-key";
+const SECRET_KEY = process.env.JWT_SECRET;
+
+if (!SECRET_KEY) {
+    throw new Error("JWT_SECRET environment variable is required");
+}
 
 
 // Crear carpeta de logs
@@ -18,16 +23,8 @@ fs.mkdirSync("/app/logs", { recursive: true });
 
 // Obtener IP del cliente
 function getClientIp(req) {
-
-    const forwarded = req.headers["x-forwarded-for"];
-
-    let ip = forwarded
-        ? forwarded.split(",")[0].trim()
-        : req.socket.remoteAddress || "-";
-
-    ip = ip.replace(/^::ffff:/, "");
-
-    return ip;
+    const ip = req.socket.remoteAddress || "-";
+    return ip.replace(/^::ffff:/, "");
 }
 
 
@@ -37,9 +34,10 @@ function accessLogger(req, res, next) {
     res.on("finish", () => {
 
         const ip = getClientIp(req);
+        const safeUrl = req.originalUrl.replace(/[\x00-\x1F\x7F]/g, "_");
 
         const logLine =
-            `${new Date().toISOString()} ${ip} "${req.method} ${req.originalUrl}" ${res.statusCode}\n`;
+            `${new Date().toISOString()} ${ip} "${req.method} ${safeUrl}" ${res.statusCode}\n`;
 
         const logFile = req.socket.encrypted
             ? "/app/logs/tls.log"
@@ -75,17 +73,34 @@ app.use(express.json());
 app.use(accessLogger);
 
 
-// Usuarios simulados LDAP
+const LDAP_USERNAME = process.env.LDAP_USERNAME;
+const LDAP_PASSWORD = process.env.LDAP_PASSWORD;
+
+if (!LDAP_USERNAME || !LDAP_PASSWORD) {
+    throw new Error("LDAP_USERNAME and LDAP_PASSWORD are required");
+}
+
 const users = [
     {
-        username: "admin",
-        password: "123456",
+        username: LDAP_USERNAME,
+        password: LDAP_PASSWORD,
         role: "user"
     }
 ];
 
 
-app.post("/login", (req, res) => {
+const loginLimiter = rateLimit({
+    windowMs: 10 * 60 * 1000,
+    limit: 5,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    keyGenerator: (req) => ipKeyGenerator(getClientIp(req)),
+    message: {
+        message: "Too many login attempts. Try again later."
+    }
+});
+
+app.post("/login", loginLimiter, (req, res) => {
 
     const { username, password } = req.body;
 

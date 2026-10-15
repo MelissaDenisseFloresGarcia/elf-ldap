@@ -4,3 +4,7 @@ logs/
 .env.*
 certs/*.key
 certs/*.pem
+
+# Local security backups
+server-backup.js
+server.js.before-security
